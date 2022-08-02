@@ -39,16 +39,6 @@ variable "image_builder_ami_name_tag" {
   type = string
 }
 
-variable "image_builder_ami_tags" {
-    description = "Tags to add onto AMI"
-    type = list(object({
-        key : string
-        values : string
-        }
-    )
-  )
-}
-
 variable "image_builder_linux" {
   type = bool
 }
