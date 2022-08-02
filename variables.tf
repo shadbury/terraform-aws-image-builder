@@ -13,11 +13,6 @@ variable "image_builder_ec2_iam_role_name" {
   description = "The EC2's IAM role name."
 }
 
-variable "image_builder_aws_s3_log_bucket" {
-  type        = string
-  description = "The S3 bucket name to send logs to."
-}
-
 variable "image_builder_aws_s3_bucket" {
   type        = string
   description = "The S3 bucket name that stores the Image Builder componeent files."
