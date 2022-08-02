@@ -31,7 +31,7 @@ variable "image_builder_aws_key_pair_name" {
   type = string
 }
 
-variable "image_builder_image_receipe_version" {
+variable "image_builder_image_recipe_version" {
   type = string
 }
 
@@ -47,7 +47,7 @@ variable "image_builder_instance_types" {
   type = list(string)
 }
 
-variable "image_builder_recepie_name" {
+variable "image_builder_recipe_name" {
   type = string
   default = "AWS_IMAGE_BUILDER"
 }
