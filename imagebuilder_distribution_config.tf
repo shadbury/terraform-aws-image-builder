@@ -4,7 +4,6 @@ resource "aws_imagebuilder_distribution_configuration" "this" {
   distribution {
     ami_distribution_configuration {
 
-      ami_tags = var.image_builder_ami_tags
 
       name = "${var.profile}-{{ imagebuilder:buildDate }}"
 

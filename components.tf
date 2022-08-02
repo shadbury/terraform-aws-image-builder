@@ -2,8 +2,8 @@ resource "aws_s3_bucket_object" "this" {
   for_each = fileset("/files/", "*")
 
   bucket = var.image_builder_aws_s3_bucket
-  key    = "/files/${each.value}"
-  source = "/files/${each.value}"
+  key    = "${path.module}/files/${each.value}"
+  source = "${path.module}/files/${each.value}"
   # If the md5 hash is different it will re-upload
   etag = filemd5("/files/${each.value}")
 }
