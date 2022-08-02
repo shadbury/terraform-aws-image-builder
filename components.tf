@@ -1,5 +1,5 @@
 resource "aws_s3_bucket_object" "this" {
-  for_each = fileset("/files/", "*")
+  for_each = fileset("${path.module}/files/", "*")
 
   bucket = var.image_builder_aws_s3_bucket
   key    = "${path.module}/files/${each.value}"
