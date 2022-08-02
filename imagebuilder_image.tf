@@ -27,7 +27,7 @@ resource "aws_imagebuilder_image_recipe" "this" {
     component_arn = aws_imagebuilder_component.cw_agent.arn
   }
 
-  name         = var.image_builder_recepie_name
+  name         = var.image_builder_recipe_name
   parent_image = var.image_builder_linux ? "arn:${data.aws_partition.current.partition}:imagebuilder:${data.aws_region.current.name}:aws:image/amazon-linux-2-x86/x.x.x" : "arn:${data.aws_partition.current.partition}:imagebuilder:${data.aws_region.current.name}:aws:image/windows-server-2022-english-core-base-x86/x.x.x"
   version      = var.image_builder_image_recipe_version
 
