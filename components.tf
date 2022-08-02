@@ -30,7 +30,7 @@ resource "aws_imagebuilder_component" "cw_agent" {
 }
 
 
-resource "aws_security_group" "image-builder" {
+resource "aws_security_group" "image_builder" {
   name        = "image-builder"
   description = "image-builder"
   vpc_id      = data.aws_vpc.main.id
