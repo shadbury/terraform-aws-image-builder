@@ -2,7 +2,7 @@ resource "aws_iam_role" "this" {
   name = var.image_builder_ec2_iam_role_name
   path = "/"
 
-  assume_role_policy = file("files/assumption-policy.json")
+  assume_role_policy = file("${path.module}/files/assumption-policy.json")
 }
 
 resource "aws_iam_instance_profile" "this" {
