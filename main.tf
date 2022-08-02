@@ -8,6 +8,6 @@ data "aws_subnet" "this" {
   }
 }
 
-data "aws_vpc" "selected" {
+data "aws_vpc" "main" {
   id = var.vpc_id
 }
