@@ -5,7 +5,7 @@ resource "aws_s3_bucket_object" "this" {
   key    = "${path.module}/files/${each.value}"
   source = "${path.module}/files/${each.value}"
   # If the md5 hash is different it will re-upload
-  etag = filemd5("/files/${each.value}")
+  etag = filemd5("${path.module}/files/${each.value}")
 }
 
 resource "aws_kms_key" "image-builder" {
