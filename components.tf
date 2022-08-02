@@ -6,6 +6,10 @@ resource "aws_s3_bucket_object" "this" {
   source = "${path.module}/files/${each.value}"
   # If the md5 hash is different it will re-upload
   etag = filemd5("${path.module}/files/${each.value}")
+
+  depends_on = [
+    module.s3.aws_s3_bucket.s3_log[0]
+  ]
 }
 
 module "s3" {
