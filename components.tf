@@ -1,15 +1,11 @@
 resource "aws_s3_bucket_object" "this" {
   for_each = fileset("${path.module}/files/", "*")
 
-  bucket = module.s3.aws_s3_bucket.s3_log[0].id
+  bucket = var.image_builder_aws_s3_bucket
   key    = "${path.module}/files/${each.value}"
   source = "${path.module}/files/${each.value}"
   # If the md5 hash is different it will re-upload
   etag = filemd5("${path.module}/files/${each.value}")
-
-  depends_on = [
-    module.s3.aws_s3_bucket.s3_log[0]
-  ]
 }
 
 module "s3" {
