@@ -1,11 +1,20 @@
 resource "aws_s3_bucket_object" "this" {
   for_each = fileset("${path.module}/files/", "*")
 
-  bucket = var.image_builder_aws_s3_bucket
+  bucket = module.s3.aws_s3_bucket.s3_log[0].id
   key    = "${path.module}/files/${each.value}"
   source = "${path.module}/files/${each.value}"
   # If the md5 hash is different it will re-upload
   etag = filemd5("${path.module}/files/${each.value}")
+}
+
+module "s3" {
+  source                = "shadbury/s3/aws"
+  version               = "1.0.3"
+  bucket_key            = var.image_builder_aws_s3_bucket
+  create_logging_bucket = true
+  logging_bucket        = "${var.image_builder_aws_s3_bucket}-logging"
+  public_access         = false
 }
 
 resource "aws_kms_key" "image-builder" {
