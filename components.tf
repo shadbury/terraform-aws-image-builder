@@ -8,8 +8,8 @@ resource "aws_s3_bucket_object" "this" {
   etag = filemd5("/files/${each.value}")
 }
 
-data "aws_kms_key" "image_builder" {
-  key_id = "alias/image-builder"
+resource "aws_kms_key" "image-builder" {
+  description             = "KMS key for image builder"
 }
 
 # Amazon Cloudwatch agent component
@@ -18,7 +18,7 @@ resource "aws_imagebuilder_component" "cw_agent" {
   platform   = "Linux"
   uri        = "s3://${var.image_builder_aws_s3_bucket}/files/amazon-cloudwatch-agent-linux.yml"
   version    = "1.0.1"
-  kms_key_id = data.aws_kms_key.image_builder.arn
+  kms_key_id = aws_kms_key.image-builder
 
   depends_on = [
     aws_s3_bucket_object.this
@@ -26,5 +26,29 @@ resource "aws_imagebuilder_component" "cw_agent" {
 
   lifecycle {
     create_before_destroy = true
+  }
+}
+
+
+resource "aws_security_group" "image-builder" {
+  name        = "image-builder"
+  description = "image-builder"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description      = "TLS from VPC"
+    from_port        = 443
+    to_port          = 443
+    protocol         = "tcp"
+    cidr_blocks      = [aws_vpc.main.cidr_block]
+    ipv6_cidr_blocks = [aws_vpc.main.ipv6_cidr_block]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
   }
 }
