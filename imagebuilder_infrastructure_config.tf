@@ -10,7 +10,7 @@ resource "aws_imagebuilder_infrastructure_configuration" "this" {
 
   logging {
     s3_logs {
-      s3_bucket_name = "${var.image_builder_aws_s3_bucket}-logging"
+      s3_bucket_name = "${aws_s3_bucket.logging_bucket.id}-logging"
       s3_key_prefix  = "image-builder"
     }
   }
