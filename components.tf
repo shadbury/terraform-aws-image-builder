@@ -18,7 +18,7 @@ resource "aws_imagebuilder_component" "cw_agent" {
   platform   = "Linux"
   uri        = "s3://${var.image_builder_aws_s3_bucket}/files/amazon-cloudwatch-agent-linux.yml"
   version    = "1.0.1"
-  kms_key_id = aws_kms_key.image-builder.id
+  kms_key_id = aws_kms_key.image-builder.arn
 
   depends_on = [
     aws_s3_bucket_object.this
