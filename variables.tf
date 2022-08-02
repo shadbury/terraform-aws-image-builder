@@ -76,6 +76,6 @@ variable "image_builder_subnet_name" {
   type = string
 }
 
-variable "image_builder_security_group_name" {
+variable "vpc_id" {
   type = string
 }

@@ -8,9 +8,6 @@ data "aws_subnet" "this" {
   }
 }
 
-data "aws_security_group" "this" {
-  filter {
-    name   = "tag:Name"
-    values = [var.image_builder_security_group_name]
-  }
+data "aws_vpc" "selected" {
+  id = var.vpc_id
 }
