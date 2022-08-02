@@ -84,4 +84,7 @@ data "aws_iam_policy_document" "image_builder" {
       ]
     }
   }
+  depends_on = [
+    module.s3.aws_s3_bucket.logging_bucket[0]
+  ]
 }
