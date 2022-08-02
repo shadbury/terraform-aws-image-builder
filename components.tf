@@ -16,7 +16,7 @@ resource "aws_kms_key" "image-builder" {
 resource "aws_imagebuilder_component" "cw_agent" {
   name       = "amazon-cloudwatch-agent-linux"
   platform   = "Linux"
-  uri        = "s3://${aws_s3_bucket.s3.id}/files/amazon-cloudwatch-agent-linux.yml"
+  uri        = "s3://${aws_s3_bucket.s3.id}/${path.module}/files/amazon-cloudwatch-agent-linux.yml"
   version    = "1.0.1"
   kms_key_id = aws_kms_key.image-builder.arn
 
@@ -115,7 +115,7 @@ resource "aws_s3_bucket_public_access_block" "s3_Access" {
 
 
 resource "aws_s3_bucket_policy" "bucket_policy" {
-  bucket = var.image_builder_aws_s3_bucket
+  bucket = aws_s3_bucket.s3.id
   policy = jsonencode(
     {
           Id        = "BUCKET-POLICY"
@@ -142,7 +142,7 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
 }
 
 resource "aws_s3_bucket_policy" "logging_bucket_policy" {
-    bucket = "${var.image_builder_aws_s3_bucket}-logging"
+    bucket = aws_s3_bucket.logging_bucket.id
     policy = jsonencode(
     {
           Id        = "BUCKET-POLICY"
