@@ -78,7 +78,7 @@ variable "image_builder_schedule" {
 
 variable "image_builder_subnet_name" {
   type = string
-  desdescription = "enter the subnet name for the image builder"
+  description = "enter the subnet name for the image builder"
 }
 
 variable "vpc_id" {
