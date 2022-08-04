@@ -23,19 +23,19 @@ resource "aws_imagebuilder_image_recipe" "this" {
     }
   }
 
-  component {
-    component_arn = aws_imagebuilder_component.cw_agent.arn
+  dynamic component {
+    for_each = data.aws_imagebuilder_components.linux.arns
+    content{
+    component_arn = component.value
+    }
   }
 
   name         = var.image_builder_recipe_name
-  parent_image = var.image_builder_linux ? "arn:${data.aws_partition.current.partition}:imagebuilder:${data.aws_region.current.name}:aws:image/amazon-linux-2-x86/x.x.x" : "arn:${data.aws_partition.current.partition}:imagebuilder:${data.aws_region.current.name}:aws:image/windows-server-2022-english-core-base-x86/x.x.x"
+  parent_image = var.image_builder_ami != null ? var.image_builder_ami : "arn:${data.aws_partition.current.partition}:imagebuilder:${data.aws_region.current.name}:aws:image/amazon-linux-2-x86/x.x.x" 
   version      = var.image_builder_image_recipe_version
+  user_data_base64 = local_file.userdata.content
 
   lifecycle {
     create_before_destroy = true
   }
-
-  depends_on = [
-    aws_imagebuilder_component.cw_agent
-  ]
 }

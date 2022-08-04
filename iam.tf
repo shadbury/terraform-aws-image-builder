@@ -13,7 +13,6 @@ resource "aws_iam_instance_profile" "this" {
 resource "aws_iam_policy" "this" {
   name        = var.image_builder_ec2_iam_role_name
   path        = "/"
-  description = "IAM ec2 instance profile for the Image Builder instances."
   policy      = data.aws_iam_policy_document.image_builder.json
 }
 
