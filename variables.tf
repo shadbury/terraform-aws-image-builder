@@ -93,6 +93,7 @@ variable "userdata"{
 variable "component_names" {
   type = list(string)
   description = "AMAZON managed applications to install https://ap-southeast-2.console.aws.amazon.com/imagebuilder/home?region=ap-southeast-2#/components"
+  default = null
 }
 
 variable "launch_template_id" {
@@ -140,4 +141,14 @@ variable "sg_egress_rules" {
       cidr_blocks = ["0.0.0.0/0"]
     }
     ]
+}
+
+variable "custom_components" {
+  type = list(object({
+    file_path    = string
+    name         = string
+    description  = string
+    platform     = string
+  }))
+  default = null
 }

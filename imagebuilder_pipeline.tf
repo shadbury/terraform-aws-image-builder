@@ -1,7 +1,7 @@
 resource "aws_imagebuilder_image_pipeline" "this" {
   name                             = var.image_builder_ami_name_tag
   status                           = var.image_builder_enabled ? "ENABLED" : "DISABLED"
-  image_recipe_arn                 = aws_imagebuilder_image_recipe.this.arn
+  image_recipe_arn                 = aws_imagebuilder_image_recipe.this[count.index].arn
   infrastructure_configuration_arn = aws_imagebuilder_infrastructure_configuration.this.arn
   distribution_configuration_arn   = aws_imagebuilder_distribution_configuration.this.arn
 
@@ -20,7 +20,7 @@ resource "aws_imagebuilder_image_pipeline" "this" {
   }
 
   depends_on = [
-    aws_imagebuilder_image_recipe.this,
+    aws_imagebuilder_image_recipe.this[count.index],
     aws_imagebuilder_infrastructure_configuration.this
   ]
 }
