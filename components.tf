@@ -1,25 +1,14 @@
-resource "aws_kms_key" "image-builder" {
-  description             = "KMS key for image builder"
-}
-
-resource "local_file" "userdata" {
-  content = var.userdata
-  filename = "userdata.template"
-}
-
-resource "local_file" "custom_components" {
-  count = length(var.custom_components.file_path) <= 1 ? length(var.custom_components.file_path) : 0
-  content = var.custom_components[count.index].file_path
-  filename = var.custom_components[count.index].name
-}
-
 resource "aws_imagebuilder_component" "custom" {
-  count = length(var.custom_components.file_path) <= 1 ? length(var.custom_components.file_path) : 0
+  count = length(var.custom_components) != null ? length(var.custom_components) : 0
   
   data     = local_file.custom_components[count.index].content
+  #uri      = "s3://${aws_s3_bucket.s3.id}/${path.module}/files/${local_file.custom_components[count.index].filename}"
   name     = var.custom_components[count.index].name
-  platform = var.custom_componentsp[count.index].platform
+  platform = var.custom_components[count.index].platform
   version  = "1.0.0"
+  depends_on = [
+    aws_s3_bucket_object.this
+  ]
 }
 
 data "aws_imagebuilder_components" "linux" {
@@ -29,56 +18,4 @@ data "aws_imagebuilder_components" "linux" {
     name   = "name"
     values = var.component_names
   }
-}
-
-resource "aws_security_group" "image_builder" {
-  name        = "image-builder"
-  description = "image-builder"
-  vpc_id      = data.aws_vpc.main.id
-}
-
-resource "aws_security_group_rule" "sg_ingress_rules" {
-  count = length(var.sg_ingress_rules)
-
-  type              = "ingress"
-  from_port         = var.sg_ingress_rules[count.index].from_port
-  to_port           = var.sg_ingress_rules[count.index].to_port
-  protocol          = var.sg_ingress_rules[count.index].protocol
-  cidr_blocks       = var.sg_ingress_rules[count.index].cidr_blocks
-  security_group_id = aws_security_group.image_builder.id
-}
-
-
-resource "aws_security_group_rule" "sg_egress_rules" {
-  count = length(var.sg_egress_rules)
-
-  type              = "egress"
-  from_port         = var.sg_egress_rules[count.index].from_port
-  to_port           = var.sg_egress_rules[count.index].to_port
-  protocol          = var.sg_egress_rules[count.index].protocol
-  cidr_blocks       = var.sg_egress_rules[count.index].cidr_blocks
-  security_group_id = aws_security_group.image_builder.id
-}
-
-
-resource "tls_private_key" "main" {
-  count = var.image_builder_aws_key_pair_name != null ? 1 : 0
-
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-resource "aws_ssm_parameter" "keypair_private" {
-  count = var.image_builder_aws_key_pair_name != null ? 1 : 0
-
-  name  = "/ec2-keypairs/${var.image_builder_ami_name_tag}"
-  type  = "SecureString"
-  value = tls_private_key.main[0].private_key_pem
-}
-
-resource "aws_key_pair" "keypair_public" {
-  count = var.image_builder_aws_key_pair_name != null ? 1 : 0
-
-  key_name   = var.image_builder_ami_name_tag
-  public_key = tls_private_key.main[0].public_key_openssh
 }
