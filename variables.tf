@@ -141,3 +141,12 @@ variable "sg_egress_rules" {
     }
     ]
 }
+
+variable "custom_components" {
+  type = list(object({
+    file_path    = string
+    name         = string
+    description  = string
+    platform     = string
+  }))
+}

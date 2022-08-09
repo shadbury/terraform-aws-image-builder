@@ -7,6 +7,21 @@ resource "local_file" "userdata" {
   filename = "userdata.template"
 }
 
+resource "local_file" "custom_components" {
+  count = length(var.custom_components.file_path) <= 1 ? length(var.custom_components.file_path) : 0
+  content = var.custom_components[count.index].file_path
+  filename = var.custom_components[count.index].name
+}
+
+resource "aws_imagebuilder_component" "custom" {
+  count = length(var.custom_components.file_path) <= 1 ? length(var.custom_components.file_path) : 0
+  
+  data     = local_file.custom_components[count.index].content
+  name     = var.custom_components[count.index].name
+  platform = var.custom_componentsp[count.index].platform
+  version  = "1.0.0"
+}
+
 data "aws_imagebuilder_components" "linux" {
   owner = "Amazon"
 
