@@ -6,9 +6,6 @@ resource "aws_imagebuilder_component" "custom" {
   name     = var.custom_components[count.index].name
   platform = var.custom_components[count.index].platform
   version  = "1.0.0"
-  depends_on = [
-    aws_s3_bucket_object.this
-  ]
 }
 
 data "aws_imagebuilder_components" "linux" {
