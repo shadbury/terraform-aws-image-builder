@@ -1,4 +1,5 @@
 resource "aws_imagebuilder_image" "this" {
+  count = length(var.custom_components.file_path) <= 1 ? 0 : 1
   distribution_configuration_arn   = aws_imagebuilder_distribution_configuration.this.arn
   image_recipe_arn                 = aws_imagebuilder_image_recipe.this.arn
   infrastructure_configuration_arn = aws_imagebuilder_infrastructure_configuration.this.arn
@@ -12,7 +13,7 @@ resource "aws_imagebuilder_image" "this" {
 }
 
 resource "aws_imagebuilder_image_recipe" "this" {
-    count = length(var.custom_components) <= 1 ? 0 : length(var.custom_components)
+    count = length(var.custom_components) <= 1 ? 0 : 1
   block_device_mapping {
     device_name = "/dev/xvdb"
 
@@ -41,8 +42,8 @@ resource "aws_imagebuilder_image_recipe" "this" {
   }
 }
 
-resource "aws_imagebuilder_image" "this" {
-  count = length(var.custom_components.file_path) <= 1 ? 0 : length(var.custom_components.file_path)
+resource "aws_imagebuilder_image" "custom" {
+  count = length(var.custom_components.file_path) <= 1 ? length(var.custom_components.file_path) : 0
   distribution_configuration_arn   = aws_imagebuilder_distribution_configuration.this.arn
   image_recipe_arn                 = aws_imagebuilder_image_recipe.this.arn
   infrastructure_configuration_arn = aws_imagebuilder_infrastructure_configuration.this.arn
@@ -55,7 +56,8 @@ resource "aws_imagebuilder_image" "this" {
   ]
 }
 
-resource "aws_imagebuilder_image_recipe" "this" {
+resource "aws_imagebuilder_image_recipe" "custom" {
+  count = length(var.custom_components.file_path) <= 1 ? length(var.custom_components.file_path) : 0
   block_device_mapping {
     device_name = "/dev/xvdb"
 
