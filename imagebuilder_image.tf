@@ -1,7 +1,7 @@
 resource "aws_imagebuilder_image" "this" {
-  count = length(var.custom_components.file_path) <= 1 ? 0 : 1
+  count = length(var.custom_components) <= 1 ? 0 : 1
   distribution_configuration_arn   = aws_imagebuilder_distribution_configuration.this.arn
-  image_recipe_arn                 = aws_imagebuilder_image_recipe.this.arn
+  image_recipe_arn                 = aws_imagebuilder_image_recipe.this[0].arn
   infrastructure_configuration_arn = aws_imagebuilder_infrastructure_configuration.this.arn
 
   depends_on = [
@@ -43,21 +43,21 @@ resource "aws_imagebuilder_image_recipe" "this" {
 }
 
 resource "aws_imagebuilder_image" "custom" {
-  count = length(var.custom_components.file_path) <= 1 ? length(var.custom_components.file_path) : 0
+  count = length(aws_imagebuilder_component.custom) <= 1 ? length(aws_imagebuilder_component.custom) : 0
   distribution_configuration_arn   = aws_imagebuilder_distribution_configuration.this.arn
-  image_recipe_arn                 = aws_imagebuilder_image_recipe.this.arn
+  image_recipe_arn                 = aws_imagebuilder_image_recipe.custom[0].arn
   infrastructure_configuration_arn = aws_imagebuilder_infrastructure_configuration.this.arn
 
   depends_on = [
     data.aws_iam_policy_document.image_builder,
-    aws_imagebuilder_image_recipe.this,
+    aws_imagebuilder_image_recipe.custom,
     aws_imagebuilder_distribution_configuration.this,
     aws_imagebuilder_infrastructure_configuration.this
   ]
 }
 
 resource "aws_imagebuilder_image_recipe" "custom" {
-  count = length(var.custom_components.file_path) <= 1 ? length(var.custom_components.file_path) : 0
+  count = length(aws_imagebuilder_component.custom) <= 1 ? length(aws_imagebuilder_component.custom) : 0
   block_device_mapping {
     device_name = "/dev/xvdb"
 
@@ -70,7 +70,7 @@ resource "aws_imagebuilder_image_recipe" "custom" {
   }
 
   dynamic component {
-    for_each = aws_imagebuilder_component.custom[count.index].arns
+    for_each = aws_imagebuilder_component.custom.*.arn
     content{
     component_arn = component.value
     }
@@ -84,4 +84,8 @@ resource "aws_imagebuilder_image_recipe" "custom" {
   lifecycle {
     create_before_destroy = true
   }
+
+  depends_on = [
+    aws_imagebuilder_component.custom
+  ]
 }

@@ -93,7 +93,7 @@ variable "userdata"{
 variable "component_names" {
   type = list(string)
   description = "AMAZON managed applications to install https://ap-southeast-2.console.aws.amazon.com/imagebuilder/home?region=ap-southeast-2#/components"
-  default = null
+  default = ["amazon-cloudwatch-agent-linux"]
 }
 
 variable "launch_template_id" {

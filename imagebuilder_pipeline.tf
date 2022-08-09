@@ -1,8 +1,8 @@
 resource "aws_imagebuilder_image_pipeline" "this" {
-  count = length(var.custom_components.file_path) <= 1 ? 0 : 1
+  count = length(var.custom_components) <= 1 ? 0 : 1
   name                             = var.image_builder_ami_name_tag
   status                           = var.image_builder_enabled ? "ENABLED" : "DISABLED"
-  image_recipe_arn                 = aws_imagebuilder_image_recipe.this[count.index].arn
+  image_recipe_arn                 = aws_imagebuilder_image_recipe.this[0].arn
   infrastructure_configuration_arn = aws_imagebuilder_infrastructure_configuration.this.arn
   distribution_configuration_arn   = aws_imagebuilder_distribution_configuration.this.arn
 
@@ -21,16 +21,16 @@ resource "aws_imagebuilder_image_pipeline" "this" {
   }
 
   depends_on = [
-    aws_imagebuilder_image_recipe.this[count.index],
+    aws_imagebuilder_image_recipe.this[0],
     aws_imagebuilder_infrastructure_configuration.this
   ]
 }
 
 resource "aws_imagebuilder_image_pipeline" "custom" {
-  count = length(var.custom_components.file_path) <= 1 ? length(var.custom_components.file_path) : 0
+  count = length(var.custom_components) <= 1 ? length(var.custom_components) : 0
   name                             = var.image_builder_ami_name_tag
   status                           = var.image_builder_enabled ? "ENABLED" : "DISABLED"
-  image_recipe_arn                 = aws_imagebuilder_image_recipe.custom[count.index].arn
+  image_recipe_arn                 = aws_imagebuilder_image_recipe.custom[0].arn
   infrastructure_configuration_arn = aws_imagebuilder_infrastructure_configuration.this.arn
   distribution_configuration_arn   = aws_imagebuilder_distribution_configuration.this.arn
 
@@ -49,7 +49,7 @@ resource "aws_imagebuilder_image_pipeline" "custom" {
   }
 
   depends_on = [
-    aws_imagebuilder_image_recipe.custom[count.index],
+    aws_imagebuilder_image_recipe.custom[0],
     aws_imagebuilder_infrastructure_configuration.this
   ]
 }
