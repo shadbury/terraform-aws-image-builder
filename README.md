@@ -12,6 +12,16 @@ The module will create:
 ``ec2 imagebuilder image``
 ``ec2 imagebuilder infrasutucture config``
 
+
+# Architecture
+![Architecture](/media/architecture-diagram.png)
+
+This solution uses `ec2 image builder`, `ec2 image builder pipeline`, `Lambda` and `sns`
+
+The image builder has a pipeline that will trigger the image build.
+The image builder will update the current AMI in the given launch template.
+When the build is complete, the pipeline will trigger a notification to be sent to the SNS queue.
+The SNS queue will trigger a lambda function to start an instance refresh for the given ASG.
 # EC2 Imagebuilder Pipeline
 
 The image builder pipeline will use the ec2 image builder image, ec2 image builder recipe, ec2 image builder distribution config and the ec2 imagebuilder infrustructure config.
