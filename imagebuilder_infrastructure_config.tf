@@ -6,4 +6,5 @@ resource "aws_imagebuilder_infrastructure_configuration" "this" {
   security_group_ids            = [aws_security_group.image_builder.id]
   subnet_id                     = data.aws_subnet.this.id
   terminate_instance_on_failure = var.terminate_instance_on_failure
+  sns_topic_arn                 = aws_sns_topic.builder.arn
 }
