@@ -78,3 +78,15 @@ data "aws_iam_policy_document" "image_builder" {
     }
   }
 }
+
+resource "aws_iam_policy_attachment" "instanceProfile" {
+  name       = "builder-instance-profile-policy"
+  roles      = [aws_iam_role.aws_iam_role.this]
+  policy_arn = "arn:aws:iam::aws:policy/EC2InstanceProfileForImageBuilder"
+}
+
+resource "aws_iam_policy_attachment" "SSMManagedInstanceCore" {
+  name       = "builder-SSM-policy"
+  roles      = [aws_iam_role.aws_iam_role.this]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
