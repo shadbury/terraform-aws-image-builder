@@ -153,7 +153,6 @@ variable "custom_components" {
   default = null
 }
 
-
 variable asg_name {
   type = string
   description = "Name of the Autoscaling group to update"
