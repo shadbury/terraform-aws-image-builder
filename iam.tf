@@ -21,3 +21,21 @@ resource "aws_iam_policy_attachment" "this" {
   roles      = [aws_iam_role.this.name]
   policy_arn = aws_iam_policy.this.arn
 }
+
+
+resource "aws_iam_role" "lambda" {
+  name = "iam_for_lambda_with_sns"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
