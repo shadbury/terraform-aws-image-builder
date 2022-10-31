@@ -39,3 +39,43 @@ resource "aws_iam_role" "lambda" {
     ]
   })
 }
+
+resource "aws_iam_policy" "policy" {
+  name        = "builder-policy"
+  path        = "/"
+  description = "builder_policy"
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "autoscaling:StartInstanceRefresh",
+          "autoscaling:Describe*",
+          "autoscaling:UpdateAutoScalingGroup",
+          "ec2:CreateLaunchTemplateVersion",
+          "ec2:DescribeLaunchTemplates",
+          "ec2:RunInstances",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "builder-attach" {
+  name       = "builder-attachment"
+  roles      = [aws_iam_role.lambda.name]
+  policy_arn = aws_iam_policy.policy.arn
+}
+
+resource "aws_lambda_permission" "allow_sns" {
+  statement_id  = "AllowExecutionFromSns"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.builder_function.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.builder.arn
+}
