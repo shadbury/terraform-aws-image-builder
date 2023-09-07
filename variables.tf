@@ -150,7 +150,7 @@ variable "custom_components" {
     description  = string
     platform     = string
   }))
-  default = null
+  default = []
 }
 
 variable asg_name {
