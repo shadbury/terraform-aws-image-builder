@@ -46,7 +46,8 @@ def trigger_auto_scaling_instance_refresh(asg_name, strategy="Rolling",
             Strategy=strategy,
             Preferences={
                 'MinHealthyPercentage': min_healthy_percentage,
-                'InstanceWarmup': instance_warmup
+                'InstanceWarmup': instance_warmup,
+                'SkipMatching' : False
             })
         logging.info("Triggered Instance Refresh {} for Auto Scaling "
                      "group {}".format(response['InstanceRefreshId'], asg_name))
