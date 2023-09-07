@@ -1,5 +1,5 @@
 resource "local_file" "userdata" {
-  content = var.userdata
+  content = var.userdata != "" ? var.userdata : ""
   filename = "${path.module}/userdata.template"
 }
 

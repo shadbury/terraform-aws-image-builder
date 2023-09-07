@@ -28,6 +28,8 @@ data "aws_iam_policy_document" "image_builder" {
       "ec2messages:GetMessages",
       "ec2messages:SendReply",
       "ec2:*",
+      "kms:Decrypt",
+      "kms:DescribeKey",
       "imagebuilder:GetComponent",
 
     ]
