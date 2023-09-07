@@ -1,5 +1,5 @@
 resource "aws_imagebuilder_image" "this" {
-  count = length(var.custom_components) <= 1 ? 0 : 1
+  count = length(var.custom_components) == 0 ? 1 : 0
   distribution_configuration_arn   = aws_imagebuilder_distribution_configuration.this.arn
   image_recipe_arn                 = aws_imagebuilder_image_recipe.this[0].arn
   infrastructure_configuration_arn = aws_imagebuilder_infrastructure_configuration.this.arn
@@ -13,7 +13,7 @@ resource "aws_imagebuilder_image" "this" {
 }
 
 resource "aws_imagebuilder_image_recipe" "this" {
-    count = length(var.custom_components) <= 1 ? 0 : 1
+    count = length(var.custom_components) == 0 ? 1 : 0
   block_device_mapping {
     device_name = "/dev/xvdb"
 
