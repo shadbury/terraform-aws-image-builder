@@ -1,5 +1,5 @@
 resource "aws_imagebuilder_image_pipeline" "this" {
-  count = length(var.custom_components) <= 1 ? 0 : 1
+  count = length(var.custom_components) == 0 ? 1 : 0
   name                             = var.image_builder_ami_name_tag
   status                           = var.image_builder_enabled ? "ENABLED" : "DISABLED"
   image_recipe_arn                 = aws_imagebuilder_image_recipe.this[0].arn
