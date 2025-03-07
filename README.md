@@ -1,85 +1,76 @@
-# Notes
+# AWS Image Builder Terraform Module
+[![Terraform](https://img.shields.io/badge/Terraform-0.12%2B-blue.svg)](https://www.terraform.io)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![GitHub](https://img.shields.io/badge/GitHub-Repo-blue.svg)](
 
-THIS IS A TERRAFORM MODULE AND NEEDS TO BE REFERENECED FROM A MODULE BLOCK IN A TF FILE. 
+## Overview
+This Terraform module creates an AWS Image Builder pipeline to build custom AMIs based on either Windows Server 2022, Amazon Linux 2, or a user-specified custom AMI. It supports dynamic configuration for the parent image, custom components, and EC2 instance deployment within the same stack.
 
-This module is designed to update an already existing launch configuration.
+## Features
 
-The module will create: 
-
-``ec2 imagebuilder pipeline``
-``ec2 imagebuilder recipe``
-``ec2 imagebuilder distribution config``
-``ec2 imagebuilder image``
-``ec2 imagebuilder infrasutucture config``
-
-
-# Architecture
-![Architecture](/media/architecture-diagram.png)
-
-This solution uses `ec2 image builder`, `ec2 image builder pipeline`, `Lambda` and `sns`
-
-The image builder has a pipeline that will trigger the image build.
-The image builder will update the current AMI in the given launch template.
-When the build is complete, the pipeline will trigger a notification to be sent to the SNS queue.
-The SNS queue will trigger a lambda function to start an instance refresh for the given ASG.
-# EC2 Imagebuilder Pipeline
-
-The image builder pipeline will use the ec2 image builder image, ec2 image builder recipe, ec2 image builder distribution config and the ec2 imagebuilder infrustructure config.
-
-The pipeline requires an already existing launch template id. This will be used to update the launch template with a new version containing the new AMI after the build is completed and tested.
-
-## EC2 Imagebuilder Recipe
-
-The Imagebuilder Recipe contains a list of values used by the ec2 imagebuilder image. 
-
-The Recipe requires Components to be listed, this is installed and used to test the image before completing the creation of the AMI
+- **Dynamic Image Type**: Choose between Windows (windows) or Linux (linux) base images, or provide a custom AMI ID.
+- **Custom Components**: Apply custom Image Builder components (e.g., PowerShell scripts for Windows, Bash scripts for Linux).
+- **EC2 Integration**: Outputs the generated AMI ID and optionally deploys an EC2 instance using it.
+- **Flexible Configuration**: Adjustable EBS volume size, instance types, and VPC/subnet settings.
 
 
-## example main.tf
-```
-module "image-builder" {
-  source  = "shadbury/image-builder/aws"
-  version = "1.0.0"
+## Configuration
 
-  profile                             = local.workspace["aws_profile"]
-  region                              = local.workspace["region"]
-  image_builder_ami_name_tag          = local.workspace["image_builder_ami_name_tag"]
-  image_builder_aws_key_pair_name     = local.workspace["image_builder_aws_key_pair_name"]
-  image_builder_ebs_root_vol_size     = local.workspace["image_builder_ebs_root_vol_size"]
-  image_builder_ec2_iam_role_name     = local.workspace["image_builder_ec2_iam_role_name"]
-  image_builder_image_recipe_version  = local.workspace["image_builder_image_recipe_version"]
-  image_builder_instance_types        = local.workspace["image_builder_instance_types"]
-  image_builder_subnet_name           = local.workspace["image_builder_subnet_name"]
-  vpc_id                              = local.workspace["vpc_id"]
-  component_names                     = local.workspace["component_names"]
-  launch_template_id                  = local.workspace["launch_template_id"]
-  userdata                            = base64encode(file("./files/userdata.template"))
-}
-```
+This module is designed to be imported into a parent Terraform configuration. To use it:
 
-## example locals.tf
-```
-locals {
+### Import the Module
 
-  client = "test-client"
-env = {
+Include this module in your Terraform configuration.
 
-  shadbolt = {
-        aws_profile                        = "shadbolts-admin"
-        region                             = "ap-southeast-2"
-        image_builder_ami_name_tag         = "shadbury"
-        image_builder_aws_key_pair_name    = "openvpn"
-        image_builder_ebs_root_vol_size    = 30
-        image_builder_ec2_iam_role_name    = "image_builder_role"
-        image_builder_image_recipe_version = "1.0.0"
-        image_builder_instance_types       = ["t2.small"]
-        image_builder_subnet_name          = "test"
-        vpc_id                             = "vpc-7d5b421a"
-        component_names                    = ["amazon-cloudwatch-agent-linux"]
-        launch_template_id                 = "lt-0e7cac7a1cb2706e1"
-      
-    }
-}
-  workspace = local.env[terraform.workspace]
-}
-```
+### Provide Component Data
+
+Pass custom component definitions via the `custom_components` variable (see Variables section). Components should be provided as a list of objects with YAML content, names, and platforms.
+
+### Set Variables
+
+Configure required variables through the parent configuration (e.g., via `terraform.tfvars` or module inputs).
+
+### Apply the Configuration
+
+Run `terraform init` and `terraform apply` from the parent directory.
+
+
+## Variables
+
+| Variable                             | Type          | Description                                           | Default       |
+|--------------------------------------|---------------|-------------------------------------------------------|---------------|
+| `region`                             | `string`      | AWS region for deployment                             | -             |
+| `image_type`                         | `string`      | Image type (`windows` or `linux`)                     | `"windows"`   |
+| `custom_ami_id`                      | `string`      | Custom AMI ID (overrides `image_type` if set)         | `null`        |
+| `image_builder_ami_name_tag`         | `string`      | Name tag for the AMI and resources                    | -             |
+| `image_builder_ebs_root_vol_size`    | `number`      | Root volume size in GB                                | `20`          |
+| `image_builder_image_recipe_version` | `string`      | Version of the image recipe                           | `"1.0.0"`     |
+| `image_builder_instance_types`       | `list(string)`| Instance types for building the image                 | `["t3.medium"]`|
+| `subnet_id`                          | `string`      | Subnet ID for Image Builder instance                  | -             |
+| `vpc_id`                             | `string`      | VPC ID for Image Builder resources                    | -             |
+| `image_builder_ec2_iam_role_name`    | `string`      | IAM role name for Image Builder                       | -             |
+| `custom_components`                  | `list(object)`| List of custom components with `file_path` (content), `name`, `description`, `platform` | `[]`          |
+
+
+## Notes
+
+### Component Input
+The `custom_components` variable expects a list of objects containing the component YAML content (`file_path`), name, description, and platform (e.g., "Windows" or "Linux"). The parent configuration must provide this data.
+
+### Custom AMI
+If using `custom_ami_id`, ensure it exists in the target region and is accessible.
+
+### Build Time
+Image creation may take 15-30 minutes, depending on components and AWS processing.
+
+## Troubleshooting
+
+### Invalid AMI Error
+Verify the `custom_ami_id` or ensure default AMIs (Windows Server 2022, Amazon Linux 2) are available in the target region.
+
+### Component Errors
+Validate that `custom_components` contains valid YAML content compatible with the target OS.
+
+### Permissions
+Confirm the IAM role specified in `image_builder_ec2_iam_role_name` has sufficient permissions (see `iam.tf`).
+
